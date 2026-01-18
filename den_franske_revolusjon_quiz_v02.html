@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz – Den franske revolusjonen (30 spørsmål)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; padding: 24px; background: #f6f7fb; }
+    .app { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .muted { color: #555; margin: 0 0 14px; }
+    .topbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .pill { background: #eef1ff; padding: 8px 10px; border-radius: 999px; font-size: 13px; color: #1f2a6b; }
+    .card { border: 1px solid #e7e7ef; border-radius: 12px; padding: 16px; background: #fff; }
+    .q { font-size: 18px; margin: 0 0 12px; }
+    .opts { display: grid; gap: 10px; margin-top: 10px; }
+    label.opt {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px; border: 1px solid #e7e7ef; border-radius: 10px;
+      cursor: pointer; user-select: none;
+    }
+    label.opt:hover { background: #fafbff; }
+    input[type="radio"] { margin-top: 3px; }
+    .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font-weight: 600;
+    }
+    button.primary { background: #3b5bff; color: #fff; }
+    button.secondary { background: #eef1ff; color: #1f2a6b; }
+    button.ghost { background: transparent; border: 1px solid #e7e7ef; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .progress { height: 10px; background: #eef0f7; border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; width: 0%; background: #3b5bff; transition: width .25s ease; }
+    .result { margin-top: 16px; }
+    .scorebig { font-size: 42px; margin: 8px 0; }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-weight: 700; }
+    .good { background: #eaffef; color: #0b6b2a; }
+    .mid  { background: #fff7db; color: #7a5a00; }
+    .low  { background: #ffe6e6; color: #8a1f1f; }
+    .review { margin-top: 12px; display: grid; gap: 10px; }
+    .review .item { border: 1px solid #e7e7ef; border-radius: 12px; padding: 12px; }
+    .right { color: #0b6b2a; font-weight: 700; }
+    .wrong { color: #8a1f1f; font-weight: 700; }
+    .small { font-size: 13px; color: #555; }
+    .tiny { font-size: 12px; color: #666; margin-top: 8px; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Quiz: Den franske revolusjonen</h1>
+        <p class="muted">30 spørsmål • Multiple choice • Random rekkefølge • Resultat vises til slutt</p>
+      </div>
+      <div class="pill" id="statusPill">Klar</div>
+    </div>
+
+    <div class="progress" aria-label="Fremdrift">
+      <div id="bar"></div>
+    </div>
+
+    <div class="card" style="margin-top: 14px;">
+      <p class="q" id="questionText"></p>
+      <div class="opts" id="options"></div>
+
+      <div class="actions">
+        <button class="ghost" id="prevBtn">Tilbake</button>
+        <button class="primary" id="nextBtn" disabled>Neste</button>
+        <button class="secondary" id="restartBtn" style="margin-left:auto;">Start på nytt</button>
+      </div>
+
+      <div class="tiny" id="hint"></div>
+
+      <div class="result" id="result" style="display:none;"></div>
+    </div>
+  </div>
+
+<script>
+  // --- Utils: shuffle ---
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let j = a.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [a[j], a[k]] = [a[k], a[j]];
+    }
+    return a;
+  }
+
+  // --- 30 spørsmål (før randomisering) ---
+  // answer = index i options-lista (før vi randomiserer alternativer)
+  const questionBank = [
+    // (De første 20 – som før)
+    { q: "Når startet den franske revolusjonen?", options: ["1776", "1789", "1814", "1914"], answer: 1, points: 1 },
+    { q: "Hva var stendersamfunnet i Frankrike delt inn i?", options: ["To grupper", "Tre stender", "Fire provinser", "Fem klasser"], answer: 1, points: 1 },
+    { q: "Hvilken stand var størst, men hadde minst makt?", options: ["1. stand (prester)", "2. stand (adel)", "3. stand (vanlige folk)", "Ingen – alle var like"], answer: 2, points: 1 },
+    { q: "Hva var Bastillen et symbol på?", options: ["Kongens makt og undertrykkelse", "Skolesystemet", "Nasjonalforsamlingen", "Napoleons hær"], answer: 0, points: 1 },
+    { q: "Hva het kongen som ble henrettet under revolusjonen?", options: ["Ludvig XIV", "Ludvig XVI", "Karl XII", "Henrik VIII"], answer: 1, points: 1 },
+    { q: "Hva var et kjent slagord fra revolusjonen?", options: ["Brød og sirkus", "Fred og orden", "Frihet – Likhet – Brorskap", "Kunnskap er makt"], answer: 2, points: 1 },
+    { q: "Hva kalles perioden med mye vold og mange henrettelser?", options: ["Renessansen", "Terrorveldet", "Industrialiseringen", "Opplysningstiden"], answer: 1, points: 1 },
+    { q: "Hvem tok etter hvert makten og ble en ledende figur etter revolusjonen?", options: ["Napoleon Bonaparte", "Julius Caesar", "Winston Churchill", "Otto von Bismarck"], answer: 0, points: 1 },
+    { q: "Hvilket problem bidro sterkt til misnøye blant folk flest?", options: ["For mye gratis mat", "Mangel på mat og dyrt brød", "For mange feriedager", "For lav befolkning"], answer: 1, points: 1 },
+    { q: "Hva handlet Opplysningstiden mest om (i denne sammenhengen)?", options: ["At kongen alltid har rett", "Nye ideer om rettigheter og fornuft", "At adel bør styre", "At krig løser alt"], answer: 1, points: 1 },
+    { q: "Hva var en viktig konsekvens av revolusjonen?", options: ["Eneveldet ble styrket", "Folkestyre og nye rettigheter fikk mer plass", "Frankrike ble en koloni", "Skattene ble fjernet helt"], answer: 1, points: 1 },
+    { q: "Hva var Nasjonalforsamlingen (enkelt forklart)?", options: ["En gruppe som prøvde å lage nye lover", "Kongens private hær", "En domstol i England", "Et fengsel i Paris"], answer: 0, points: 1 },
+    { q: "Hva betyr omtrent 'enevelde'?", options: ["At folket bestemmer", "At kongen har nesten all makt", "At landet styres av flere partier", "At kirken bestemmer alt"], answer: 1, points: 1 },
+    { q: "Hva var guillotine?", options: ["Et lovforslag", "Et henrettelsesredskap", "En type skatt", "En revolusjonær avis"], answer: 1, points: 1 },
+    { q: "Hva var en typisk kritikk av skattesystemet før revolusjonen?", options: ["Adelen betalte mest", "Alle betalte like mye", "Vanlige folk betalte mest", "Ingen betalte skatt"], answer: 2, points: 1 },
+    { q: "Hva skjedde med kong Ludvig XVI i 1793?", options: ["Han ble kronet på nytt", "Han ble henrettet", "Han ble statsminister", "Han flyttet til USA"], answer: 1, points: 1 },
+    { q: "Hva er 'Erklæringen om menneskets og borgerens rettigheter'?", options: ["En liste over rettigheter og friheter", "En handleliste for hæren", "En avtale mellom Norge og Frankrike", "En lov som forbyr valg"], answer: 0, points: 1 },
+    { q: "Hvorfor ble Bastillen stormet (enkelt forklart)?", options: ["For å finne våpen og vise motstand mot kongen", "For å starte en brann", "For å feire kongen", "For å åpne et museum"], answer: 0, points: 1 },
+    { q: "Hva var målet for mange revolusjonære?", options: ["Mer makt til adel og kirke", "Mer rettferdighet og representasjon", "Å få flere skatter", "Å stoppe all handel"], answer: 1, points: 1 },
+    { q: "Hva endte Napoleon med å bli?", options: ["Borgermester", "Keiser", "Pave", "Konge av England"], answer: 1, points: 1 },
+
+    // +10 nye (30 totalt)
+    { q: "Hva var en viktig årsak til at staten hadde dårlig økonomi før revolusjonen?", options: ["Frankrike hadde nesten ingen kriger", "Dyre kriger og mye statsgjeld", "For lave lønninger i fabrikker", "For mye gratis utdanning"], answer: 1, points: 1 },
+    { q: "Hva var 'Tredjestanden' hovedsakelig?", options: ["Bare adel", "Vanlige folk som bønder, arbeidere og borgere", "Bare prester", "Bare militære ledere"], answer: 1, points: 1 },
+    { q: "Hva var 'stenderforsamlingen' (Estates-General) i 1789?", options: ["Et møte mellom stendene for å diskutere problemer", "En ny type fengsel", "En revolusjonær avis", "Et nytt universitet"], answer: 0, points: 1 },
+    { q: "Hva var et typisk krav fra mange i tredjestanden?", options: ["Mer makt til kongen", "Mer rettferdig representasjon og skatt", "Mindre handel", "Flere adelstitler"], answer: 1, points: 1 },
+    { q: "Hva var en av de store ideene som spredte seg i Europa etter revolusjonen?", options: ["At konger alltid må arve makt", "At mennesker har grunnleggende rettigheter", "At skatter ikke er viktig", "At krig alltid er løsningen"], answer: 1, points: 1 },
+    { q: "Hva var et mål med å lage en grunnlov?", options: ["Å gi kongen ubegrenset makt", "Å sette regler for hvordan landet skal styres", "Å avskaffe alle lover", "Å fjerne alle valg for alltid"], answer: 1, points: 1 },
+    { q: "Hva kan 'terrorveldet' si oss om revolusjoner?", options: ["De er alltid fredelige", "De kan bli voldelige og gå for langt", "De handler bare om mote", "De skjer bare i små land"], answer: 1, points: 1 },
+    { q: "Hvorfor var brød så viktig i denne perioden?", options: ["Folk spiste nesten aldri brød", "Brød var en stor del av kostholdet", "Brød var bare for adel", "Brød ble brukt som penger"], answer: 1, points: 1 },
+    { q: "Hva skjedde med adelens privilegier under revolusjonen?", options: ["De ble ofte redusert eller fjernet", "De ble mye sterkere", "De ble flyttet til England", "De ble byttet med flere skatter for bøndene"], answer: 0, points: 1 },
+    { q: "Hvilken setning passer best til resultatet av revolusjonen?", options: ["Alt ble likt over natten", "Mye endret seg, men det var også kaos og konflikt", "Ingenting endret seg", "Frankrike sluttet å eksistere"], answer: 1, points: 1 }
+  ];
+
+  // --- Bygg en "spillbar" quiz med random rekkefølge ---
+  // For hvert spørsmål randomiserer vi svaralternativer og oppdaterer korrekt svar-index.
+  const quiz = shuffle(questionBank).map((item) => {
+    const correctText = item.options[item.answer];
+    const newOptions = shuffle(item.options);
+    const newAnswerIndex = newOptions.indexOf(correctText);
+    return {
+      q: item.q,
+      options: newOptions,
+      answer: newAnswerIndex,
+      points: item.points ?? 1
+    };
+  });
+
+  // --- App state ---
+  let i = 0;
+  const answers = Array(quiz.length).fill(null);
+
+  // --- Elements ---
+  const questionText = document.getElementById("questionText");
+  const optionsEl = document.getElementById("options");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const resultEl = document.getElementById("result");
+  const bar = document.getElementById("bar");
+  const statusPill = document.getElementById("statusPill");
+  const hint = document.getElementById("hint");
+
+  function render() {
+    if (i >= quiz.length) { showResult(); return; }
+
+    // quiz view
+    resultEl.style.display = "none";
+    questionText.style.display = "";
+    optionsEl.style.display = "";
+    prevBtn.style.display = "";
+    nextBtn.style.display = "";
+    hint.style.display = "";
+
+    statusPill.textContent = `Spørsmål ${i + 1} / ${quiz.length}`;
+    const progress = Math.round((i / quiz.length) * 100);
+    bar.style.width = progress + "%";
+
+    const item = quiz[i];
+    questionText.textContent = item.q;
+    optionsEl.innerHTML = "";
+    hint.textContent = "Tips: Du kan gå tilbake og endre svar før du fullfører.";
+
+    item.options.forEach((opt, idx) => {
+      const id = `q${i}_opt${idx}`;
+      const label = document.createElement("label");
+      label.className = "opt";
+      label.htmlFor = id;
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `q${i}`;
+      radio.id = id;
+      radio.value = idx;
+      radio.checked = (answers[i] === idx);
+
+      radio.addEventListener("change", () => {
+        answers[i] = idx;
+        nextBtn.disabled = false;
+        nextBtn.textContent = (i === quiz.length - 1) ? "Fullfør" : "Neste";
+      });
+
+      const span = document.createElement("span");
+      span.textContent = opt;
+
+      label.appendChild(radio);
+      label.appendChild(span);
+      optionsEl.appendChild(label);
+    });
+
+    prevBtn.disabled = (i === 0);
+    nextBtn.disabled = (answers[i] === null);
+    nextBtn.textContent = (i === quiz.length - 1) ? "Fullfør" : "Neste";
+  }
+
+  function calcScore() {
+    let score = 0, max = 0;
+    quiz.forEach((item, idx) => {
+      max += (item.points ?? 1);
+      if (answers[idx] === item.answer) score += (item.points ?? 1);
+    });
+    return { score, max };
+  }
+
+  function showResult() {
+    const { score, max } = calcScore();
+    const pct = Math.round((score / max) * 100);
+
+    bar.style.width = "100%";
+    statusPill.textContent = "Ferdig";
+
+    // hide question UI
+    questionText.style.display = "none";
+    optionsEl.style.display = "none";
+    prevBtn.style.display = "none";
+    nextBtn.style.display = "none";
+    hint.style.display = "none";
+
+    let badgeClass = "low", badgeText = "Prøv igjen!";
+    if (pct >= 80) { badgeClass = "good"; badgeText = "Sterkt!"; }
+    else if (pct >= 50) { badgeClass = "mid"; badgeText = "Bra innsats!"; }
+
+    resultEl.style.display = "";
+    resultEl.innerHTML = `
+      <div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        <div class="scorebig">${score} / ${max}</div>
+        <div class="small">Du fikk ${pct}% riktig. Under er gjennomgang (vises først nå).</div>
+      </div>
+      <div class="review" id="review"></div>
+    `;
+
+    const review = document.getElementById("review");
+    quiz.forEach((item, idx) => {
+      const correctIdx = item.answer;
+      const yourIdx = answers[idx];
+      const isRight = (yourIdx === correctIdx);
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div><strong>${idx + 1}. ${item.q}</strong></div>
+        <div class="${isRight ? "right" : "wrong"}" style="margin-top:6px;">
+          ${isRight ? "Riktig" : "Feil"}
+        </div>
+        <div class="small" style="margin-top:6px;">
+          Ditt svar: ${yourIdx === null ? "Ikke besvart" : item.options[yourIdx]}
+          <br/>
+          Riktig svar: ${item.options[correctIdx]}
+        </div>
+      `;
+      review.appendChild(div);
+    });
+  }
+
+  // --- Events ---
+  prevBtn.addEventListener("click", () => { if (i > 0) i--; render(); });
+
+  nextBtn.addEventListener("click", () => {
+    if (answers[i] === null) return;
+    i++;
+    render();
+  });
+
+  restartBtn.addEventListener("click", () => {
+    // Start på nytt med samme random-rekkefølge i denne økten.
+    // For ny random rekkefølge: refresh siden.
+    i = 0;
+    for (let k = 0; k < answers.length; k++) answers[k] = null;
+    bar.style.width = "0%";
+    statusPill.textContent = "Klar";
+    render();
+  });
+
+  // start
+  render();
+</script>
+</body>
+</html>
