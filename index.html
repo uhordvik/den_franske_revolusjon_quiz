@@ -447,20 +447,19 @@
   }
 
   function showResult() {
+
+    // 🔊 FANFARE – iOS-godkjent
+  const fanfare = document.getElementById("fanfare");
+  if (fanfare) {
+    fanfare.currentTime = 0;
+    fanfare.play();
+  }
+    
     const { score, max } = calcScore();
     const pct = Math.round((score / max) * 100);
 
     bar.style.width = "100%";
     statusPill.textContent = "Ferdig";
-
-    // Spill fanfare (fungerer på iPhone fordi den trigges etter klikk)
-    const fanfare = document.getElementById("fanfare");
-    if (fanfare) {
-      fanfare.currentTime = 0;
-      fanfare.play().catch(() => {
-        // iOS kan blokkere hvis bruker har lyd av – ignorer stille
-      });
-    }
     
     // hide question UI
     questionText.style.display = "none";
@@ -531,6 +530,7 @@
 </script>
 </body>
 </html>
+
 
 
 
