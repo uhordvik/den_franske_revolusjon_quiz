@@ -49,6 +49,9 @@
 </head>
 
 <body>
+  <audio id="fanfare" preload="auto">
+  <source src="SuperMarioBeedoo.mp3" type="audio/mpeg">
+</audio>
   <div class="app">
     <div class="topbar">
       <div>
@@ -450,6 +453,15 @@
     bar.style.width = "100%";
     statusPill.textContent = "Ferdig";
 
+    // Spill fanfare (fungerer på iPhone fordi den trigges etter klikk)
+    const fanfare = document.getElementById("fanfare");
+    if (fanfare) {
+      fanfare.currentTime = 0;
+      fanfare.play().catch(() => {
+        // iOS kan blokkere hvis bruker har lyd av – ignorer stille
+      });
+    }
+    
     // hide question UI
     questionText.style.display = "none";
     optionsEl.style.display = "none";
@@ -519,6 +531,7 @@
 </script>
 </body>
 </html>
+
 
 
 
