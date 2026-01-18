@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz – Den franske revolusjonen (40 spørsmål)</title>
+  <title>Quiz – Den franske revolusjonen (50 spørsmål)</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     body { margin: 0; padding: 24px; background: #f6f7fb; }
@@ -53,7 +53,7 @@
     <div class="topbar">
       <div>
         <h1>Quiz: Den franske revolusjonen</h1>
-        <p class="muted">40 spørsmål • Multiple choice • Random rekkefølge • Resultat vises til slutt</p>
+        <p class="muted">50 spørsmål • Multiple choice • Random rekkefølge • Resultat vises til slutt</p>
       </div>
       <div class="pill" id="statusPill">Klar</div>
     </div>
@@ -236,8 +236,120 @@
       ],
       answer: 0,
       points: 1
+    },
+
+    // +10 spørsmål (videregående nivå)
+    {
+      q: "Hvilken sammenheng forklarer best hvorfor økonomiske problemer bidro til revolusjonen?",
+      options: [
+        "Staten brukte mye penger på kriger, noe som førte til høy gjeld og økte skatter",
+        "Frankrike hadde for få soldater",
+        "Industrien var for godt utviklet",
+        "Handelen med kolonier stoppet helt"
+      ],
+      answer: 0,
+      points: 1
+    },
+    {
+      q: "Hvorfor fikk opplysningstidens ideer så stor betydning for revolusjonen?",
+      options: [
+        "De støttet enevelde og kongens makt",
+        "De la vekt på fornuft, menneskerettigheter og maktfordeling",
+        "De fokuserte mest på religion",
+        "De var kun kjent blant bønder"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hva var et hovedproblem med stemmereglene i stenderforsamlingen i 1789?",
+      options: [
+        "Bare tredjestanden fikk stemme",
+        "Hver stand hadde én stemme, uavhengig av størrelse",
+        "Kongen stemte alene",
+        "Kvinner hadde flere stemmer enn menn"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hvordan kan terrorveldet tolkes historisk?",
+      options: [
+        "Som et forsøk på å beskytte revolusjonen gjennom ekstrem maktbruk",
+        "Som en periode uten politiske mål",
+        "Som en tilbakevending til enevelde",
+        "Som en økonomisk reformperiode"
+      ],
+      answer: 0,
+      points: 1
+    },
+    {
+      q: "Hvorfor ble henrettelsen av Ludvig XVI et vendepunkt?",
+      options: [
+        "Den avsluttet alle konflikter",
+        "Den viste at kongemakten definitivt var avskaffet",
+        "Den førte til mindre motstand mot revolusjonen",
+        "Den styrket monarkiet i Europa"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hvilken påstand beskriver best forholdet mellom revolusjon og vold?",
+      options: [
+        "Vold var helt unødvendig for revolusjonen",
+        "Vold ble brukt både for å skape og forsvare politiske endringer",
+        "Vold kom kun fra utenlandske fiender",
+        "Vold oppstod først etter Napoleons maktovertakelse"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hva var en viktig grunn til at mange europeiske monarkier fryktet den franske revolusjonen?",
+      options: [
+        "Frankrike hadde en sterkere økonomi",
+        "Revolusjonens ideer kunne spre seg og true deres egen makt",
+        "Revolusjonen ønsket å avskaffe alle landegrenser",
+        "Frankrike ville avslutte all handel"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hvordan kan Napoleons maktovertakelse tolkes i lys av revolusjonen?",
+      options: [
+        "Som en full tilbakevending til enevelde uten revolusjonære ideer",
+        "Som et kompromiss mellom revolusjonens idealer og sterk sentralmakt",
+        "Som et totalt brudd med revolusjonen",
+        "Som et resultat av kirkelig maktovertakelse"
+      ],
+      answer: 1,
+      points: 1
+    },
+    {
+      q: "Hva var en langsiktig konsekvens av den franske revolusjonen i Europa?",
+      options: [
+        "At demokratiske ideer og nasjonalisme spredte seg",
+        "At alle land fikk republikansk styre umiddelbart",
+        "At adelens makt økte overalt",
+        "At krig forsvant fra Europa"
+      ],
+      answer: 0,
+      points: 1
+    },
+    {
+      q: "Hvilken historisk ferdighet testes best i spørsmålet: 'I hvilken grad oppfylte revolusjonen idealene om frihet og likhet?'",
+      options: [
+        "Å huske årstall",
+        "Å lese kilder bokstavelig",
+        "Å vurdere og drøfte historiske prosesser",
+        "Å finne riktige definisjoner"
+      ],
+      answer: 2,
+      points: 1
     }
-  
+    
   ];
 
   // --- Bygg en "spillbar" quiz med random rekkefølge ---
@@ -407,6 +519,7 @@
 </script>
 </body>
 </html>
+
 
 
 
